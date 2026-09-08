@@ -1,7 +1,6 @@
+from functions import ODE
 import numpy as np
 import pandas as pd
-import matplotlib as mpl
-import matplotlib.pyplot as plt
 import sys
 
 
@@ -63,32 +62,14 @@ def TaylorExpansion(step_h):
 h = 0.1
 tayor_t, tayor_y = TaylorExpansion(step_h=h)
 
-# Long-format DataFrame
+# DataFrame
 data = pd.DataFrame({
     'Time':  np.concatenate([time, tayor_t]),
     'y(t)': np.concatenate([y, tayor_y]),
     'y': ['Exact'] * len(time) + [f'Taylor (h={h})'] * len(tayor_y),
 })
 
-
+ode = ODE
+ode.plotLines(data)
 # Plot data
-fig, ax = plt.subplots(figsize=(8, 5))
-ax.plot(time, y, color='#101010', linewidth=1.5, label=label)
-ax.plot(tayor_t, tayor_y, color='#20BB20', linewidth=0.75, linestyle='--',
-        label=f'Taylor (h={h})')
-ax.scatter(tayor_t, tayor_y, marker='D', s=20, color='#20BB20', zorder=5)
-ax.legend(loc='best', framealpha=0.8)
 
-# Styling
-ax.set_title('Taylor Expansion', fontsize=16, fontweight='bold')
-ax.set_xlabel('Time', fontsize=14)
-ax.set_ylabel('y(t)', fontsize=14, rotation=0, labelpad=20)
-ax.tick_params(labelsize=12)
-
-# Grid
-ax.grid(True, linewidth=0.25, color='black')
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-
-plt.tight_layout()
-plt.show()
