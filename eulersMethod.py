@@ -1,11 +1,12 @@
 import numpy as np
 import pandas as pd
-from plotnine import *
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 import sys
 
 
 # Input: Time
-timestep = 0.01 # Time step
+timestep = 0.05 # Time step
 duration = 2
 time = np.arange(0, duration+timestep, timestep)
 nDatapoints = len(time)
@@ -46,42 +47,48 @@ for i in range(1,1):
     sets['time'].append(time)
 
 
-# for h in [timestep*5, timestep*3, timestep*2]:
-tayor = []
-for h in [0.05]:
-    for t in np.arange(0, duration+h, h):
-        tayor.append(y[0] + diff1[0]*t)
+
 
 
 # ========================================================================================
+def TaylorExpansion(step_h):
+    t_taylor = np.arange(0, duration + h, h)
+    y_taylor = (y[0] + diff1[0] * t_taylor +
+                diff1[0] * (t_taylor**2)/2 +
+                diff2[0] * (t_taylor**3)/3 +
+                diff3[0] * (t_taylor**4)/4)
+    return t_taylor, y_taylor
+
 # Build the Taylor approximation
-tayor_t = np.arange(0, duration + h, h)
-tayor_y = y[0] + diff1[0] * tayor_t + diff1[0] * (tayor_t**2)/2
+h = 0.1
+tayor_t, tayor_y = TaylorExpansion(step_h=h)
 
 # Long-format DataFrame
 data = pd.DataFrame({
     'Time':  np.concatenate([time, tayor_t]),
     'y(t)': np.concatenate([y, tayor_y]),
-    'Series': ['Exact'] * len(time) + [f'Taylor (h={h})'] * len(tayor_y),
+    'y': ['Exact'] * len(time) + [f'Taylor (h={h})'] * len(tayor_y),
 })
-tayor_data = data[data['Series'] == f'Taylor (h={h})']
-p = (
-        ggplot(data, aes(x='Time', y='y(t)', colour='Series', linetype='Series'))
-        + geom_line(size=0.75) # Line width
-        + geom_point(data=tayor_data, shape=10, size=3) # diamonds on Taylor only
-        + scale_color_manual(values={'Exact': '#101010', f'Taylor (h={h})': '#20BB20'})
-        + scale_linetype_manual(values={'Exact': 'solid', f'Taylor (h={h})': 'dashed'})
-        + labs(title='Taylor Expansion')
-        + theme_bw()
-        + theme(
-    figure_size=(8, 5),
-    plot_title=element_text(size=16, face='bold'),
-    axis_title_x=element_text(size=14),
-    axis_title_y=element_text(size=14, rotation=0),
-    axis_text=element_text(size=12),
-    strip_background=element_blank(),
-    panel_border=element_rect(color='black', fill=None),
-    panel_grid_major=element_line(color='black', size=0.25),
-)
-)
-p.show()
+
+
+# Plot data
+fig, ax = plt.subplots(figsize=(8, 5))
+ax.plot(time, y, color='#101010', linewidth=1.5, label=label)
+ax.plot(tayor_t, tayor_y, color='#20BB20', linewidth=0.75, linestyle='--',
+        label=f'Taylor (h={h})')
+ax.scatter(tayor_t, tayor_y, marker='D', s=20, color='#20BB20', zorder=5)
+ax.legend(loc='best', framealpha=0.8)
+
+# Styling
+ax.set_title('Taylor Expansion', fontsize=16, fontweight='bold')
+ax.set_xlabel('Time', fontsize=14)
+ax.set_ylabel('y(t)', fontsize=14, rotation=0, labelpad=20)
+ax.tick_params(labelsize=12)
+
+# Grid
+ax.grid(True, linewidth=0.25, color='black')
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+
+plt.tight_layout()
+plt.show()
