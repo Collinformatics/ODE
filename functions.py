@@ -66,7 +66,7 @@ class ODE:
         self.figureResolution = 600
 
 
-    def plotLines(self, data, colors, title, labelX, labelY):
+    def plotLines(self, data, colors, title, labelX, labelY, yRotate=0):
         fig, ax = plt.subplots(figsize=self.figSize)
         for i in range(data.columns.size):
             ax.plot(data.index, data.iloc[:,i], color=colors[i],
@@ -77,7 +77,7 @@ class ODE:
         # Styling
         ax.set_title(title, fontsize=self.labelSizeTitle, fontweight='bold')
         ax.set_xlabel(labelX, fontsize=self.labelSizeAxis)
-        ax.set_ylabel(labelY, fontsize=self.labelSizeAxis, labelpad=20, rotation=90)
+        ax.set_ylabel(labelY, fontsize=self.labelSizeAxis, labelpad=20, rotation=yRotate)
         ax.tick_params(labelsize=12)
 
         # Axis params
