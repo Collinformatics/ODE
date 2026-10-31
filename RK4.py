@@ -1,5 +1,7 @@
 from functions import ODE
+import numpy as np
 import pandas as pd
+import random
 
 
 """
@@ -24,17 +26,20 @@ inFigName = False
 
 
 # ========================================================================================
-# Set options
-pd.set_option('display.max_columns', None)
-pd.set_option('display.width', 1000)
-pd.set_option('display.float_format', '{:,.2f}'.format)
-
-# Initialize class
-ode = ODE(duration=inDatapoints, timestep=inTimestep)
+def expCurve(xValues, A, b, k,  error):
+    d = pd.DataFrame(0.0, index=[], columns=['y'])
+    for x in xValues:
+        val = (A * np.exp(x * k) + b) + random.uniform(0, error)
+        d.loc[x + 1, 'y'] = val
+    return d
 
 
 # ========================================================================================
-data = ode.expCurve(A=inA, k=inK, b=inB, error=inDeviation)
+# Initialize class
+ode = ODE(duration=inDatapoints, timestep=inTimestep)
+
+# Generate data
+data = expCurve(xValues=ode.time, A=inA, k=inK, b=inB, error=inDeviation)
 data = ode.rk4(curve=data)
 
 # Plot data

@@ -73,15 +73,6 @@ class ODE:
         return curve
 
 
-    def expCurve(self, A, b, k,
-                 error):
-        d = pd.DataFrame(0.0, index=[], columns=['y'])
-        for x in self.time:
-            val = (A * np.exp(x * k) + b) + random.uniform(0, error)
-            d.loc[x + 1, 'y'] = val
-        return d
-
-
     def plotLines(self, data, colors, title,
                   labelX, labelY, yRotate=0, browserFig=False):
         fig, ax = plt.subplots(figsize=self.figSize)
