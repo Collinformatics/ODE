@@ -1,14 +1,15 @@
 import os
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 import numpy as np
 import pandas as pd
+import random
 import sys
 
 
 # Set options
 pd.set_option('display.max_columns', None)
+pd.set_option('display.max_rows', 10)
 pd.set_option('display.width', 1000)
 pd.set_option('display.float_format', '{:,.2f}'.format)
 
@@ -58,15 +59,31 @@ class ODE:
         # Params: Figures
         self.figSize = (9.5, 8) # (width, height)
         self.figSizeWide = (9.5, 5)
-        self.labelSizeTitle = 20 # Set fontsize
-        self.labelSizeAxis = 16 # Set fontsize
-        self.labelSizeTicks = 12 # Set fontsize
+        self.labelSizeTitle = 20 # Set font-size
+        self.labelSizeAxis = 16 # Set font-size
+        self.labelSizeTicks = 12 # Set font-size
         self.lineThickness = 1.5
         self.tickLength = 4
         self.figureResolution = 600
 
 
-    def plotLines(self, data, colors, title, labelX, labelY, yRotate=0):
+    def rk4(self, curve):
+        print(f'Runge-Kutta')
+        print(curve)
+        return curve
+
+
+    def expCurve(self, A, b, k,
+                 error):
+        d = pd.DataFrame(0.0, index=[], columns=['y'])
+        for x in self.time:
+            val = (A * np.exp(x * k) + b) + random.uniform(0, error)
+            d.loc[x + 1, 'y'] = val
+        return d
+
+
+    def plotLines(self, data, colors, title,
+                  labelX, labelY, yRotate=0, browserFig=False):
         fig, ax = plt.subplots(figsize=self.figSize)
         for i in range(data.columns.size):
             ax.plot(data.index, data.iloc[:,i], color=colors[i],
@@ -97,5 +114,14 @@ class ODE:
             spine.set_visible(True)
 
         plt.tight_layout()
-        fig.canvas.mpl_connect('key_press_event', pressKey)
-        plt.show()
+        if browserFig:
+            import subprocess
+
+            # Save figure
+            savePath = os.path.join('Figures', f'{browserFig}.png')
+            plt.savefig(savePath, bbox_inches='tight')
+            print(f'Figure was saved at path:\n\t{savePath}\n')
+            subprocess.run(['xdg-open', savePath])  # Open fig in web browser
+        else:
+            fig.canvas.mpl_connect('key_press_event', pressKey)
+            plt.show()
