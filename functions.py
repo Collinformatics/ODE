@@ -1,3 +1,4 @@
+import jax
 import os
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
@@ -82,24 +83,28 @@ class ODE:
         return x**3
 
 
-    def rk4(self, curve):
-        import jax
+    @staticmethod
+    def differentiate(self, f):
+        df_dt = jax.grad(f)
+
+
+    def rk4(self, f, h):
         print(f'Runge-Kutta')
+        d = pd.DataFrame(0.0, index=self.time, columns=['RK4'])
 
-        # Generate curve
-        curve = self.genCurve(error=0.1)
-        df_dt = jax.grad(self.f)
+        def step(t, y):
+            k1 = f(t, y)
+            k2 = f(t + h/2, y + h/2 * k1)
+            k3 = f(t + h / 2, y + h / 2 * k2)
+            k4 = f(t + h / 2, y + h * k3)
+            return y + h/6 * (k1 + 2*k2 + 2*k3 + k4)
 
-
-        # Differentiate
-        values = []
-        for i, x in enumerate(curve.iloc[:, 0]):
-            curve.loc[curve.index[i], 'df/dt'] = df_dt(x)
-            # if i >= 10:
-            #     sys.exit()
-
-        print(curve)
-        return curve
+        # Evaluate
+        y = 2
+        for i, t in enumerate(d.index):
+            d.loc[t, 'RK4'] = y
+            y = step(t, y)
+        return d
 
 
     def plotLines(self, data, colors, title,
@@ -118,12 +123,14 @@ class ODE:
         ax.tick_params(labelsize=12)
 
         # Axis params
-        xTicks, pad = getAxisTicks(data.index)
+        xTicks, pad = getAxisTicks(values=data.index)
         if xTicks:
             ax.set_xlim(data.index[0]-pad, data.index[-1]+pad)
             ax.set_xticks(xTicks)
         else:
             ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+        ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+        ax.set_ylim(top=int(np.ceil(ax.get_ylim()[1])))
 
         # Grid
         ax.grid(True, linewidth=0.25, color='black')

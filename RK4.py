@@ -1,51 +1,43 @@
 from functions import ODE
 import numpy as np
-import pandas as pd
-import random
 
 
 """
-    Use Runge-Kutta to approximate a curve
+    Use Runge-Kutta 4 to solve an ODE by approximate the solution of a first-order ODE.
+    
+    This allows us to start with a function that describes the change:
+        y' = f(t, y)
+    
+    and find a function that makes the first derivative true:
+        y(t)
+
+    Steps forward from an initial condition y(t_0) = y_0 in increments of h.
+    Approximate y(t) at discrete time points by averaging four slope estimates per step. 
+    
+    Returns an array of (t, y) values.
 """
 
-
-# Input: Curve Params
-inA = 0.1
-inB = 0
-inK = 0.5
-inDeviation = 0.5
 
 # Input: Time
 inTimestep = 0.01 # Time step
-inDatapoints = 1
+inDatapoints = 5
 
 # Figure params
 inColors = ['black','green']
 inFigName = 'runge_kutta4'
-inBrowserFig = False
+inBrowserFig = True
 
-
-# ========================================================================================
-def exponential(x):
-    return np.exp(x)
-
-
-def genCurve(timepoints, A, b, k,  error):
-    d = pd.DataFrame(0.0, index=[], columns=['y'])
-    for t in timepoints:
-        # val = (A * np.exp(x * k) + b) + random.uniform(0, error)
-        d.loc[t, 'y'] = exponential(t) + random.uniform(0, error)
-    return d
+# Input: 1st Derivative
+def firstDerivative(t, y):
+    return y*2 - 4*t*y + 4*np.sin(t) + 7
 
 
 # ========================================================================================
 # Initialize class
 ode = ODE(duration=inDatapoints, timestep=inTimestep)
 
-# Generate data
-# data = ode.genCurve(timepoints=ode.time, A=inA, k=inK, b=inB, error=inDeviation)
-data = pd.DataFrame()
-data = ode.rk4(curve=data)
+# Solve
+data = ode.rk4(f=firstDerivative, h=inTimestep)
 
 # Plot data
 if inBrowserFig:
