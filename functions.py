@@ -51,7 +51,7 @@ def getAxisTicks(values, largeValues=True, customSteps=None):
             ticks = list(np.arange(values[0], values[-1] + step, step))
             print(f'Step: {step}')
             break
-    print(f'xTicks: {ticks}\n')
+    # print(f'xTicks: {ticks}\n')
     return ticks, padding
 
 
@@ -88,7 +88,7 @@ class ODE:
         df_dt = jax.grad(f)
 
 
-    def rk4(self, f, h):
+    def rk4(self, f, h, y0):
         print(f'Runge-Kutta')
         d = pd.DataFrame(0.0, index=self.time, columns=['RK4'])
 
@@ -100,10 +100,11 @@ class ODE:
             return y + h/6 * (k1 + 2*k2 + 2*k3 + k4)
 
         # Evaluate
-        y = 2
+        y = y0
         for i, t in enumerate(d.index):
             d.loc[t, 'RK4'] = y
             y = step(t, y)
+        print(f'Data:\n{d}\n')
         return d
 
 
@@ -130,7 +131,8 @@ class ODE:
         else:
             ax.xaxis.set_major_locator(MaxNLocator(integer=True))
         ax.yaxis.set_major_locator(MaxNLocator(integer=True))
-        ax.set_ylim(top=int(np.ceil(ax.get_ylim()[1])))
+        if max(ax.get_ylim()) > 1:
+            ax.set_ylim(top=int(np.ceil(ax.get_ylim()[1])))
 
         # Grid
         ax.grid(True, linewidth=0.25, color='black')

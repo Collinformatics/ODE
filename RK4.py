@@ -23,21 +23,23 @@ inTimestep = 0.01 # Time step
 inDatapoints = 5
 
 # Figure params
-inColors = ['black','green']
+inColors = ['green']
 inFigName = 'runge_kutta4'
 inBrowserFig = True
 
 # Input: 1st Derivative
+inInitY = 0
 def firstDerivative(t, y):
-    return y*2 - 4*t*y + 4*np.sin(t) + 7
+    return np.tan(2*t) - t*np.exp(np.sin(y))
 
 
 # ========================================================================================
 # Initialize class
+
 ode = ODE(duration=inDatapoints, timestep=inTimestep)
 
 # Solve
-data = ode.rk4(f=firstDerivative, h=inTimestep)
+data = ode.rk4(f=firstDerivative, h=inTimestep, y0=inInitY)
 
 # Plot data
 if inBrowserFig:
