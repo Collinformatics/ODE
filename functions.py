@@ -61,6 +61,7 @@ class ODE:
         self.printN = 10
 
         # Params: Figures
+        self.figPath = 'Figures'
         self.figSize = (9.5, 8) # (width, height)
         self.figSizeWide = (9.5, 5)
         self.labelSizeTitle = 20 # Set font-size
@@ -147,7 +148,7 @@ class ODE:
             import subprocess
 
             # Save figure
-            savePath = os.path.join('Figures', f'{browserFig}.png')
+            savePath = os.path.join(self.figPath, f'{browserFig}.png')
             plt.savefig(savePath, bbox_inches='tight')
             print(f'Figure was saved at path:\n\t{savePath}\n')
             subprocess.run(['xdg-open', savePath])  # Open fig in web browser
