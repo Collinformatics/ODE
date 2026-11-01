@@ -13,6 +13,9 @@ pd.set_option('display.max_rows', 10)
 pd.set_option('display.width', 1000)
 pd.set_option('display.float_format', '{:,.2f}'.format)
 
+# GPU Usage
+# print(f'Jax Device: {jax.default_backend()}')
+
 
 def pressKey(event):
     if event.key == 'escape':
@@ -67,8 +70,34 @@ class ODE:
         self.figureResolution = 600
 
 
+    def genCurve(self, error):
+        d = pd.DataFrame(0.0, index=[], columns=['y'])
+        for t in self.time:
+            d.loc[t, 'y'] = self.f(t) + random.uniform(0, error)
+        return d
+
+
+    @staticmethod
+    def f(x):
+        return x**3
+
+
     def rk4(self, curve):
+        import jax
         print(f'Runge-Kutta')
+
+        # Generate curve
+        curve = self.genCurve(error=0.1)
+        df_dt = jax.grad(self.f)
+
+
+        # Differentiate
+        values = []
+        for i, x in enumerate(curve.iloc[:, 0]):
+            curve.loc[curve.index[i], 'df/dt'] = df_dt(x)
+            # if i >= 10:
+            #     sys.exit()
+
         print(curve)
         return curve
 

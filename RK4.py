@@ -10,27 +10,31 @@ import random
 
 
 # Input: Curve Params
-inA = 0.05
-inB = -0.75
-inK = 1
+inA = 0.1
+inB = 0
+inK = 0.5
 inDeviation = 0.5
 
 # Input: Time
-inTimestep = 0.1 # Time step
-inDatapoints = 5
+inTimestep = 0.01 # Time step
+inDatapoints = 1
 
 # Figure params
-inColors = ['green', 'black']
-inFigName = 'runge_kutta'
-inFigName = False
+inColors = ['black','green']
+inFigName = 'runge_kutta4'
+inBrowserFig = False
 
 
 # ========================================================================================
-def expCurve(xValues, A, b, k,  error):
+def exponential(x):
+    return np.exp(x)
+
+
+def genCurve(timepoints, A, b, k,  error):
     d = pd.DataFrame(0.0, index=[], columns=['y'])
-    for x in xValues:
-        val = (A * np.exp(x * k) + b) + random.uniform(0, error)
-        d.loc[x + 1, 'y'] = val
+    for t in timepoints:
+        # val = (A * np.exp(x * k) + b) + random.uniform(0, error)
+        d.loc[t, 'y'] = exponential(t) + random.uniform(0, error)
     return d
 
 
@@ -39,12 +43,18 @@ def expCurve(xValues, A, b, k,  error):
 ode = ODE(duration=inDatapoints, timestep=inTimestep)
 
 # Generate data
-data = expCurve(xValues=ode.time, A=inA, k=inK, b=inB, error=inDeviation)
+# data = ode.genCurve(timepoints=ode.time, A=inA, k=inK, b=inB, error=inDeviation)
+data = pd.DataFrame()
 data = ode.rk4(curve=data)
 
 # Plot data
-ode.plotLines(
-    data=data, colors=inColors, title='Runge-Kutta 4', labelX='Time', labelY='y(t)',
-    browserFig=inFigName
-)
-
+if inBrowserFig:
+    ode.plotLines(
+        data=data, colors=inColors, title='Runge-Kutta 4',
+        labelX='Time', labelY='y(t)', browserFig=inFigName
+    )
+else:
+    ode.plotLines(
+        data=data, colors=inColors, title='Runge-Kutta 4',
+        labelX='Time', labelY='y(t)', browserFig=False
+    )

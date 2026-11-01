@@ -1,3 +1,4 @@
+jax[cuda13]
 numpy
 pandas
 matplotlib
