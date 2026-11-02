@@ -61,7 +61,7 @@ class ODE:
         self.printN = 10
 
         # Params: Figures
-        self.figPath = 'Figures'
+        self.figDir = 'Figures'
         self.figSize = (9.5, 8) # (width, height)
         self.figSizeWide = (9.5, 5)
         self.labelSizeTitle = 20 # Set font-size
@@ -70,6 +70,9 @@ class ODE:
         self.lineThickness = 1.5
         self.tickLength = 4
         self.figureResolution = 600
+
+        if not os.path.exists(self.figDir):
+            os.makedirs(self.figDir, exist_ok=True)
 
 
     def genCurve(self, error):
@@ -148,7 +151,7 @@ class ODE:
             import subprocess
 
             # Save figure
-            savePath = os.path.join(self.figPath, f'{browserFig}.png')
+            savePath = os.path.join(self.figDir, f'{browserFig}.png')
             plt.savefig(savePath, bbox_inches='tight')
             print(f'Figure was saved at path:\n\t{savePath}\n')
             subprocess.run(['xdg-open', savePath])  # Open fig in web browser
